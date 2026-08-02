@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Windsor Nguyen
 -/
 
+import ComplexityTheory.Foundations.Tautology
 import ComplexityTheory.ProofComplexity.Jump
 
 /-!
@@ -16,16 +17,6 @@ system. No runtime claim is made in this module.
 -/
 
 namespace ComplexityTheory
-
-/--
-A Boolean-valued decision procedure that agrees extensionally with semantic
-tautologicity. The structure contains no machine or runtime certificate.
--/
-structure TautologyDecider where
-  /-- Return the proposed tautology decision. -/
-  decide : BooleanFormula → Bool
-  /-- The decision is true exactly for tautologies. -/
-  correct : ∀ formula, decide formula = true ↔ formula.IsTautology
 
 namespace TautologyDecider
 
