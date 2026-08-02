@@ -1,0 +1,105 @@
+title: "Proposal: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Propose one formalization decision. State the mathematical contract,
+        representation choices, and evidence required to accept it.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: State the proposed result and why the library needs it now.
+      placeholder: In two to four sentences, explain what should change and why.
+    validations:
+      required: true
+
+  - type: textarea
+    id: contract
+    attributes:
+      label: Mathematical contract
+      description: State the definitions and headline theorem as precisely as possible.
+      placeholder: |
+        Definitions:
+        - ...
+
+        Theorem:
+        - ...
+
+        Non-goals:
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: representation
+    attributes:
+      label: Representation choices
+      description: Name encodings, machine models, resource conventions, and edge cases.
+      placeholder: |
+        Inputs are represented as...
+        Complexity is measured by...
+        Malformed inputs...
+        Empty inputs...
+    validations:
+      required: true
+
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources and correspondence
+      description: Link primary sources and explain whether the statement is exact or equivalent.
+      placeholder: |
+        - Primary source:
+        - Source locator:
+        - Correspondence: exact | equivalent | stronger | weaker
+        - Required bridge theorem:
+    validations:
+      required: true
+
+  - type: textarea
+    id: delivery
+    attributes:
+      label: Delivery
+      description: Split the proof into independently checkable milestones.
+      placeholder: |
+        1. Milestone: ...
+           Exit criterion: ...
+        2. Milestone: ...
+           Exit criterion: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Compare the strongest credible model or proof alternatives.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Validation
+      description: Define the build, axiom audit, examples, and equivalence evidence required.
+      placeholder: |
+        - Build:
+        - Axiom audit:
+        - Executable examples:
+        - Model equivalence:
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: readiness
+    attributes:
+      label: Review readiness
+      options:
+        - label: I reviewed the relevant primary sources and existing Lean libraries.
+          required: true
+        - label: The proposal names its model, encoding, and resource conventions.
+          required: true
+        - label: Acceptance criteria distinguish kernel correctness from source fidelity.
+          required: true

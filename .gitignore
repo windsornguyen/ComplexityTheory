@@ -1,0 +1,6 @@
+/.lake
+/node_modules
+**/.terraform/*
+*.tfplan
+*.tfstate
+*.tfstate.*

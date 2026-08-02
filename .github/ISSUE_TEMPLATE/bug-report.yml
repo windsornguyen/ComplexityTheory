@@ -1,0 +1,66 @@
+name: Bug Report
+description: Report an incorrect definition, theorem, proof, or build
+labels: [bug]
+body:
+  - type: textarea
+    id: tldr
+    attributes:
+      label: TL;DR
+      description: State the failure and its mathematical or practical impact.
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the issue, including the relevant declarations or diagnostics.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest Lean example that demonstrates the issue.
+      render: lean
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: State the definition, theorem, or behavior you expected.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Foundations
+        - Machines
+        - Complexity classes
+        - Reductions
+        - Circuits
+        - Build and CI
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: toolchain
+    attributes:
+      label: Lean toolchain
+      description: Copy the value from `lean-toolchain` or the output of `lean --version`.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Include source references, commit hashes, logs, or screenshots.

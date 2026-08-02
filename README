@@ -1,0 +1,16 @@
+ComplexityTheory
+================
+
+A formalization of computational complexity theory in Lean.
+
+Build
+-----
+
+::
+
+   lake exe cache get
+   lake build
+
+License
+-------
+MIT

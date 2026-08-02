@@ -1,0 +1,21 @@
+Repository controls
+===================
+
+Terraform owns the repository settings, Actions allowlist, Dependabot security
+updates, and the ``main`` ruleset.
+
+Apply
+-----
+
+Set ``GITHUB_TOKEN`` to a token with repository administration access, then::
+
+   terraform -chdir=iac/github init
+   terraform -chdir=iac/github plan
+   terraform -chdir=iac/github apply
+
+GitHub's Terraform provider does not expose public-fork workflow approval.
+Reconcile that setting once after repository creation::
+
+   gh api --method PUT \
+     repos/windsornguyen/ComplexityTheory/actions/permissions/fork-pr-contributor-approval \
+     -f approval_policy=all_external_contributors

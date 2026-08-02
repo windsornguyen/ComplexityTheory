@@ -1,0 +1,25 @@
+name = "complexitytheory"
+version = "0.0.0"
+description = "A formalization of computational complexity theory in Lean"
+keywords = ["complexity-theory", "formal-verification", "math"]
+homepage = "https://github.com/windsornguyen/ComplexityTheory"
+license = "MIT"
+licenseFiles = ["LICENSE"]
+readmeFile = "README"
+defaultTargets = ["ComplexityTheory"]
+lintDriver = "batteries/runLinter"
+lintDriverArgs = ["ComplexityTheory"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.32.1"
+
+[[lean_lib]]
+name = "ComplexityTheory"
