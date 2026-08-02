@@ -3,10 +3,12 @@ import ComplexityTheory.Foundations.BinaryString
 import ComplexityTheory.Foundations.NatEncoding
 import ComplexityTheory.Foundations.BooleanFormula
 import ComplexityTheory.Foundations.FormulaEncoding
+import ComplexityTheory.Foundations.Tautology
 import ComplexityTheory.Foundations.FormulaRestriction
 import ComplexityTheory.Foundations.FormulaPadding
 import ComplexityTheory.Foundations.DecisionProblem
 import ComplexityTheory.ComplexityClasses.P
+import ComplexityTheory.ComplexityClasses.Tautology
 import ComplexityTheory.ProofComplexity.ProofSystem
 import ComplexityTheory.ProofComplexity.Verifier
 import ComplexityTheory.ProofComplexity.LowerBound
