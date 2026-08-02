@@ -1,3 +1,4 @@
+import ComplexityTheory.Foundations.Asymptotics
 import ComplexityTheory.Foundations.BinaryString
 import ComplexityTheory.Foundations.NatEncoding
 import ComplexityTheory.Foundations.BooleanFormula
