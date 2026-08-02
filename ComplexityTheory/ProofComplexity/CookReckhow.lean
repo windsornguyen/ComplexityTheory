@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Windsor Nguyen
 -/
 
-import Mathlib.Computability.TuringMachine.Computable
+import ComplexityTheory.Computability.PolyTime
 import ComplexityTheory.ProofComplexity.Simulation
 
 /-!
@@ -20,15 +20,6 @@ the machine computes the declared function within that clock.
 -/
 
 namespace ComplexityTheory
-
-/--
-A certificate that `function` is computed by a Mathlib finite multitape Turing
-machine within a polynomial number of steps under the supplied encodings.
--/
-abbrev PolyTimeComputable {input output : Type}
-    (encodeInput : input → BitString) (encodeOutput : output → BitString)
-    (function : input → output) :=
-  Turing.TM2ComputableInPolyTime encodeInput encodeOutput function
 
 /--
 A Cook-Reckhow system is a sound and complete tautology proof map together

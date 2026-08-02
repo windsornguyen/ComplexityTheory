@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Windsor Nguyen
 -/
 
+import ComplexityTheory.Computability.PolyTime
 import ComplexityTheory.Foundations.DecisionProblem
-import Mathlib.Computability.TuringMachine.Computable
 
 /-!
 # Deterministic polynomial time
@@ -45,7 +45,7 @@ structure PolyTimeDecider (problem : DecisionProblem) where
   correct : decide.Decides problem
   /-- A finite multitape machine computes the decision within a polynomial clock. -/
   computesInPolyTime :
-    Turing.TM2ComputableInPolyTime id Computability.encodeBool decide
+    PolyTimeComputable id Computability.encodeBool decide
 
 namespace DecisionProblem
 
@@ -63,7 +63,7 @@ in `P`. The semantic correctness proof is supplied by `decides_language`.
 -/
 theorem language_isInP (function : BooleanFunction)
     (computesInPolyTime :
-      Turing.TM2ComputableInPolyTime id Computability.encodeBool function) :
+      PolyTimeComputable id Computability.encodeBool function) :
     function.language.IsInP :=
   ⟨{
     decide := function
