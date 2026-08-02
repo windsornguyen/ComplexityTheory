@@ -101,6 +101,63 @@ suffix. This is the token-level round-trip used by the stream decoder.
     decodePrefix? (token.encode ++ suffix) = some (token, suffix) := by
   cases token <;> simp [encode, decodePrefix?]
 
+/--
+Every successfully decoded token prefix is exactly the canonical encoding of
+the returned token followed by the returned suffix. In particular, the token
+decoder accepts no alternative representation of a token.
+-/
+theorem eq_encode_append_of_decodePrefix?_eq_some
+    {bits : BitString} {token : Token} {suffix : BitString}
+    (hdecode : decodePrefix? bits = some (token, suffix)) :
+    bits = token.encode ++ suffix := by
+  match bits with
+  | bit₀ :: bit₁ :: bit₂ :: rest =>
+    cases bit₀ with
+    | false =>
+      cases bit₁ with
+      | false =>
+        cases bit₂ with
+        | false =>
+          simp only [decodePrefix?] at hdecode
+          cases hvalue : NatPrefixCode.decodePrefix? rest with
+          | none => simp [hvalue] at hdecode
+          | some result =>
+            rcases result with ⟨index, tokenSuffix⟩
+            simp only [hvalue] at hdecode
+            rcases hdecode with ⟨rfl, rfl⟩
+            rw [NatPrefixCode.eq_encode_append_of_decodePrefix?_eq_some hvalue]
+            simp [encode]
+        | true =>
+          simp only [decodePrefix?] at hdecode
+          cases hdecode
+          rfl
+      | true =>
+        cases bit₂ with
+        | false =>
+          simp only [decodePrefix?] at hdecode
+          cases hdecode
+          rfl
+        | true =>
+          simp only [decodePrefix?] at hdecode
+          cases hdecode
+          rfl
+    | true =>
+      cases bit₁ with
+      | false =>
+        cases bit₂ with
+        | false =>
+          simp only [decodePrefix?] at hdecode
+          cases hdecode
+          rfl
+        | true =>
+          simp only [decodePrefix?] at hdecode
+          cases hdecode
+          rfl
+      | true => simp [decodePrefix?] at hdecode
+  | [] => simp [decodePrefix?] at hdecode
+  | _ :: [] => simp [decodePrefix?] at hdecode
+  | _ :: _ :: [] => simp [decodePrefix?] at hdecode
+
 /-- Reserved tag `110` is rejected rather than assigned an accidental meaning. -/
 @[simp] theorem decodePrefix?_reserved₀ (suffix : BitString) :
     decodePrefix? (true :: true :: false :: suffix) = none := by

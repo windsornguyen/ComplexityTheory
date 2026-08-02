@@ -71,6 +71,34 @@ This is the compositional round-trip property needed by token decoders.
       rfl
 
 /--
+Every successful prefix decoding identifies the bits it consumed as the
+canonical encoding of the returned natural number. The unconsumed suffix is
+preserved exactly.
+-/
+theorem eq_encode_append_of_decodePrefix?_eq_some
+    {bits : BitString} {value : Nat} {suffix : BitString}
+    (hdecode : decodePrefix? bits = some (value, suffix)) :
+    bits = encode value ++ suffix := by
+  induction bits generalizing value suffix with
+  | nil => simp [decodePrefix?] at hdecode
+  | cons bit bits ih =>
+    cases bit with
+    | false =>
+      simp only [decodePrefix?] at hdecode
+      cases hdecode
+      rfl
+    | true =>
+      simp only [decodePrefix?] at hdecode
+      cases hrest : decodePrefix? bits with
+      | none => simp [hrest] at hdecode
+      | some result =>
+        rcases result with ⟨restValue, restSuffix⟩
+        simp only [hrest] at hdecode
+        rcases hdecode with ⟨rfl, rfl⟩
+        rw [ih hrest]
+        simp [encode, Computability.unaryEncodeNat, List.append_assoc]
+
+/--
 Exact decoding reverses canonical encoding. In plain language, every natural
 number survives an encode-decode round trip.
 -/
