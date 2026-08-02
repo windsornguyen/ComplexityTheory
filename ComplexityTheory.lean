@@ -5,6 +5,7 @@ import ComplexityTheory.Foundations.FormulaEncoding
 import ComplexityTheory.Foundations.FormulaRestriction
 import ComplexityTheory.Foundations.FormulaPadding
 import ComplexityTheory.Foundations.DecisionProblem
+import ComplexityTheory.ComplexityClasses.P
 import ComplexityTheory.ProofComplexity.ProofSystem
 import ComplexityTheory.ProofComplexity.Verifier
 import ComplexityTheory.ProofComplexity.LowerBound
