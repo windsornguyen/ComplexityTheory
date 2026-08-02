@@ -11,6 +11,11 @@ Build
    lake exe cache get
    lake build
 
+Documentation
+-------------
+
+https://windsornguyen.github.io/ComplexityTheory/
+
 License
 -------
 Apache-2.0

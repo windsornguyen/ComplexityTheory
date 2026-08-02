@@ -1,5 +1,7 @@
 /.lake
 /node_modules
+/site
+/docbuild/.lake
 **/.terraform/*
 *.tfplan
 *.tfstate
