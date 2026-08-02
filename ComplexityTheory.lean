@@ -1,3 +1,5 @@
+import ComplexityTheory.Foundations.BinaryString
+
 /-!
 # ComplexityTheory
 
