@@ -55,11 +55,7 @@ export const ci = workflow({
 			name: "Lean",
 			"runs-on": "ubuntu-24.04",
 			"timeout-minutes": 30,
-			permissions: {
-				contents: "read",
-				pages: "write",
-				"id-token": "write",
-			},
+			permissions: { contents: "read" },
 			steps: [
 				checkout,
 				{
@@ -71,10 +67,6 @@ export const ci = workflow({
 						"use-github-cache": "true",
 						"use-mathlib-cache": "true",
 					},
-				},
-				{
-					name: "Build documentation",
-					uses: "leanprover-community/docgen-action@56dff2bb89f3e9b8c1b6d5c8410362c19de2d904",
 				},
 			],
 		}),

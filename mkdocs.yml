@@ -1,0 +1,35 @@
+site_name: ComplexityTheory
+site_description: A formalization of computational complexity theory in Lean.
+site_url: https://windsornguyen.github.io/ComplexityTheory/
+repo_url: https://github.com/windsornguyen/ComplexityTheory
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - navigation.instant
+
+plugins:
+  - search
+  - llmstxt:
+      full_output: llms-full.txt
+      markdown_description: |
+        ComplexityTheory is a Lean 4 library for formalizing computational
+        complexity theory on top of Mathlib.
+      sections:
+        Guide:
+          - index.md
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn

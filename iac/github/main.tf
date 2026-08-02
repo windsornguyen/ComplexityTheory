@@ -27,6 +27,11 @@ resource "github_repository" "this" {
   archive_on_destroy          = true
 }
 
+resource "github_repository_pages" "this" {
+  repository = github_repository.this.name
+  build_type = "workflow"
+}
+
 resource "github_actions_repository_permissions" "this" {
   repository      = github_repository.this.name
   enabled         = true
@@ -41,10 +46,7 @@ resource "github_actions_repository_permissions" "this" {
     patterns_allowed = [
       "googleapis/release-please-action@*",
       "hashicorp/setup-terraform@*",
-      "leanprover-community/docgen-action@*",
       "leanprover/lean-action@*",
-      "ruby/setup-ruby@*",
-      "xu-cheng/texlive-action@*",
     ]
     verified_allowed = false
   }
@@ -112,6 +114,11 @@ resource "github_repository_ruleset" "main" {
 
 import {
   to = github_repository.this
+  id = local.repository
+}
+
+import {
+  to = github_repository_pages.this
   id = local.repository
 }
 

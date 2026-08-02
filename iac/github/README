@@ -1,8 +1,8 @@
 Repository controls
 ===================
 
-Terraform owns the repository settings, Actions allowlist, Dependabot security
-updates, and the ``main`` ruleset.
+Terraform owns the repository settings, GitHub Pages, Actions allowlist,
+Dependabot security updates, and the ``main`` ruleset.
 
 Apply
 -----
