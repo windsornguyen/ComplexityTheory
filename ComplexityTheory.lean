@@ -7,6 +7,7 @@ import ComplexityTheory.Foundations.FormulaPadding
 import ComplexityTheory.ProofComplexity.ProofSystem
 import ComplexityTheory.ProofComplexity.Verifier
 import ComplexityTheory.ProofComplexity.LowerBound
+import ComplexityTheory.ProofComplexity.Simulation
 
 /-!
 # ComplexityTheory
