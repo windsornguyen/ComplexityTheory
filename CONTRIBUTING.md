@@ -76,5 +76,5 @@ proofs they submit.
 
 ## License
 
-By contributing, you agree that your contribution is licensed under the MIT
-License.
+By contributing, you agree that your contribution is licensed under the
+Apache License 2.0.
