@@ -1,4 +1,5 @@
 import ComplexityTheory.Foundations.BinaryString
+import ComplexityTheory.Foundations.BooleanFormula
 
 /-!
 # ComplexityTheory
