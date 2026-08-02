@@ -8,6 +8,7 @@ import ComplexityTheory.ProofComplexity.ProofSystem
 import ComplexityTheory.ProofComplexity.Verifier
 import ComplexityTheory.ProofComplexity.LowerBound
 import ComplexityTheory.ProofComplexity.Simulation
+import ComplexityTheory.ProofComplexity.CookReckhow
 
 /-!
 # ComplexityTheory
