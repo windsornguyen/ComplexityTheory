@@ -3,6 +3,7 @@ import ComplexityTheory.Foundations.NatEncoding
 import ComplexityTheory.Foundations.BooleanFormula
 import ComplexityTheory.Foundations.FormulaEncoding
 import ComplexityTheory.Foundations.FormulaRestriction
+import ComplexityTheory.Foundations.FormulaPadding
 
 /-!
 # ComplexityTheory
