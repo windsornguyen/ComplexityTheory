@@ -1,7 +1,7 @@
 import ComplexityTheory.Foundations.BinaryString
 import ComplexityTheory.Foundations.NatEncoding
 import ComplexityTheory.Foundations.BooleanFormula
-import ComplexityTheory.Foundations.FormulaEncoding.Stream
+import ComplexityTheory.Foundations.FormulaEncoding
 
 /-!
 # ComplexityTheory
