@@ -78,16 +78,16 @@ def unduplicate? : BitString → Option BitString
     omega
 
 /--
-Encode a pair as in Arora and Barak: double both strings and separate them
-with `01`, the code assigned to the delimiter. The decoder can therefore find
-the boundary without receiving either component length separately.
+Encode a pair as in Arora and Barak: double the first string, append `01` as a
+delimiter, then append the second string unchanged. The decoder can therefore
+find the boundary without receiving either component length separately.
 -/
 def pair (x y : BitString) : BitString :=
-  duplicate x ++ [false, true] ++ duplicate y
+  duplicate x ++ [false, true] ++ y
 
 /-- Pairing with an empty first component begins immediately with the delimiter. -/
 @[simp] theorem pair_nil (y : BitString) :
-    pair [] y = false :: true :: duplicate y := by
+    pair [] y = false :: true :: y := by
   rfl
 
 /-- Pairing exposes a duplicated head bit, supporting structural proofs over the first component. -/
@@ -97,9 +97,7 @@ def pair (x y : BitString) : BitString :=
 
 /-- Decode a pair, rejecting malformed doubled bits or a missing delimiter instead of guessing. -/
 def unpair? : BitString → Option (BitString × BitString)
-  | false :: true :: bits => do
-      let second ← unduplicate? bits
-      return ([], second)
+  | false :: true :: bits => some ([], bits)
   | false :: false :: bits => do
       let (first, second) ← unpair? bits
       return (false :: first, second)
@@ -117,7 +115,7 @@ def unpair? : BitString → Option (BitString × BitString)
 
 /-- Pair encoding has linear size with an exact two-bit delimiter overhead. -/
 @[simp] theorem length_pair (x y : BitString) :
-    (pair x y).length = 2 * x.length + 2 + 2 * y.length := by
+    (pair x y).length = 2 * x.length + 2 + y.length := by
   simp [pair]
   omega
 
@@ -145,7 +143,7 @@ namespace BinaryEncoding
 Encode a product by encoding each component and then applying the canonical
 bitstring pair encoding.
 Letting `aCode = ea.encode a` and `bCode = eb.encode b`, the result is
-`duplicate aCode ++ 01 ++ duplicate bCode`.
+`duplicate aCode ++ 01 ++ bCode`.
 This named layer keeps component serialization separate from pair framing.
 The decoder can therefore reverse the two stages independently.
 This is the encoder used by `prod` below.
@@ -177,11 +175,11 @@ def prod {α β : Type*} (ea : BinaryEncoding α) (eb : BinaryEncoding β) :
     rintro ⟨a, b⟩
     simp [encodeProd, decodeProd?]
 
-/-- The composed pair encoding has the exact doubled-payload and delimiter cost. -/
+/-- The composed pair encoding has the exact first-code doubling and delimiter cost. -/
 @[simp] theorem length_prod_encode {α β : Type*}
     (ea : BinaryEncoding α) (eb : BinaryEncoding β) (a : α) (b : β) :
     ((prod ea eb).encode (a, b)).length =
-      2 * (ea.encode a).length + 2 + 2 * (eb.encode b).length := by
+      2 * (ea.encode a).length + 2 + (eb.encode b).length := by
   simp [prod, encodeProd]
 
 end BinaryEncoding
