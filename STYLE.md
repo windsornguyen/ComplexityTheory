@@ -36,6 +36,11 @@ provenance readable as the library grows.
   notation relies on context or implicit coercion.
 - Executable parsers and decoders must reject malformed input. Do not invent a
   value, silently ignore trailing data, or add a fallback representation.
+- Do not add fallback execution paths. If the declared operation cannot run,
+  expose a typed failure instead of silently selecting another implementation.
+  A total mathematical map may require an output for rejected inputs; name it
+  `rejectionOutput`, show the branch in its defining equation, and cite the
+  totality requirement. Do not describe that output as a fallback.
 
 ## Sources
 
