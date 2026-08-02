@@ -70,6 +70,45 @@ consuming a caller-provided suffix.
       simp [decodeTokens?, ih, List.append_assoc]
 
 /--
+Successful fixed-count token decoding consumes exactly the canonical
+encodings of the returned tokens and returns a stream of the requested length.
+-/
+theorem eq_flatMap_encode_append_of_decodeTokens?_eq_some
+    {count : Nat} {bits : BitString} {stream : List Token} {suffix : BitString}
+    (hdecode : decodeTokens? count bits = some (stream, suffix)) :
+    bits = stream.flatMap Token.encode ++ suffix ∧ stream.length = count := by
+  induction count generalizing bits stream suffix with
+  | zero =>
+    simp only [decodeTokens?] at hdecode
+    cases hdecode
+    simp
+  | succ count ih =>
+    simp only [decodeTokens?] at hdecode
+    cases htoken : Token.decodePrefix? bits with
+    | none => simp [htoken] at hdecode
+    | some tokenResult =>
+      rcases tokenResult with ⟨token, rest⟩
+      cases hrest : decodeTokens? count rest with
+      | none => simp [htoken, hrest] at hdecode
+      | some streamResult =>
+        rcases streamResult with ⟨tail, tokenSuffix⟩
+        have hresult : (token :: tail, tokenSuffix) = (stream, suffix) := by
+          apply Option.some.inj
+          rw [← hdecode]
+          simp [htoken, hrest]
+        rcases hresult with ⟨rfl, rfl⟩
+        obtain ⟨hrestBits, htailLength⟩ := ih hrest
+        constructor
+        · calc
+            bits = token.encode ++ rest :=
+              Token.eq_encode_append_of_decodePrefix?_eq_some htoken
+            _ = token.encode ++ (tail.flatMap Token.encode ++ suffix) := by
+              rw [hrestBits]
+            _ = (token :: tail).flatMap Token.encode ++ suffix := by
+              simp [List.append_assoc]
+        · simp [htailLength]
+
+/--
 Prefix decoding reverses formula encoding and preserves the supplied suffix.
 This is the compositional round-trip property of the whole wire format.
 -/
@@ -84,11 +123,74 @@ This is the compositional round-trip property of the whole wire format.
   rw [build?_tokens]
   rfl
 
+/--
+Every successful formula-prefix decoding consumes exactly the canonical
+encoding of the returned formula. The parser therefore preserves the supplied
+suffix without accepting an alternative representation of the formula.
+-/
+theorem eq_encode_append_of_decodePrefix?_eq_some
+    {bits : BitString} {formula : BooleanFormula} {suffix : BitString}
+    (hdecode : decodePrefix? bits = some (formula, suffix)) :
+    bits = encode formula ++ suffix := by
+  unfold decodePrefix? at hdecode
+  cases hcount : NatPrefixCode.decodePrefix? bits with
+  | none => simp [hcount] at hdecode
+  | some countResult =>
+    rcases countResult with ⟨count, rest⟩
+    cases htokens : decodeTokens? count rest with
+    | none => simp [hcount, htokens] at hdecode
+    | some tokensResult =>
+      rcases tokensResult with ⟨stream, tokenSuffix⟩
+      cases hbuild : build? stream with
+      | none => simp [hcount, htokens, hbuild] at hdecode
+      | some result =>
+        have hresult : (result, tokenSuffix) = (formula, suffix) := by
+          apply Option.some.inj
+          rw [← hdecode]
+          simp [hcount, htokens, hbuild]
+        rcases hresult with ⟨rfl, rfl⟩
+        obtain ⟨hrest, hlength⟩ :=
+          eq_flatMap_encode_append_of_decodeTokens?_eq_some htokens
+        have hstream := eq_tokens_of_build?_eq_some hbuild
+        have hcountSize : count = formula.size := by
+          rw [← hlength, hstream, length_tokens]
+        calc
+          bits = NatPrefixCode.encode count ++ rest :=
+            NatPrefixCode.eq_encode_append_of_decodePrefix?_eq_some hcount
+          _ = NatPrefixCode.encode count ++
+              (stream.flatMap Token.encode ++ suffix) := by rw [hrest]
+          _ = encode formula ++ suffix := by
+            simp [encode, hstream, hcountSize, List.append_assoc]
+
 /-- Every Boolean formula survives an exact encode-decode round trip. -/
 @[simp] theorem decode?_encode (formula : BooleanFormula) :
     decode? (encode formula) = some formula := by
   unfold decode?
   rw [show encode formula = encode formula ++ [] by simp, decodePrefix?_encode_append]
+
+/--
+Exact decoding succeeds only on the canonical encoding of the returned
+formula. Combined with `decode?_encode`, this establishes a two-sided
+round-trip invariant for all successfully decoded bitstrings.
+-/
+theorem eq_encode_of_decode?_eq_some
+    {bits : BitString} {formula : BooleanFormula}
+    (hdecode : decode? bits = some formula) :
+    bits = encode formula := by
+  unfold decode? at hdecode
+  cases hprefix : decodePrefix? bits with
+  | none => simp [hprefix] at hdecode
+  | some result =>
+    rcases result with ⟨decoded, suffix⟩
+    match suffix with
+    | [] =>
+      have hresult : decoded = formula := by
+        apply Option.some.inj
+        rw [← hdecode]
+        simp [hprefix]
+      subst decoded
+      simpa using eq_encode_append_of_decodePrefix?_eq_some hprefix
+    | _ :: _ => simp [hprefix] at hdecode
 
 /-- Canonical formula encodings are injective, so one code names at most one formula. -/
 theorem encode_injective : Function.Injective encode := by
