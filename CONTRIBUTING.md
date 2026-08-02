@@ -8,9 +8,9 @@ Search the existing issues, discussions, and pull requests before starting
 work. Open an issue or discussion first for new foundations, public APIs,
 notation, dependencies, or large formalizations.
 
-For results taken from a textbook or paper, cite the source and state any
-change in assumptions or formulation. A proof that compiles can still
-formalize the wrong theorem.
+Follow [STYLE.md](STYLE.md) for source citations, declaration documentation,
+proof structure, and verification requirements. A proof that compiles can
+still formalize the wrong theorem.
 
 ## Development Setup
 
@@ -76,5 +76,4 @@ proofs they submit.
 
 ## License
 
-By contributing, you agree that your contribution is licensed under the
-Apache License 2.0.
+Released under Apache 2.0 license as described in the file LICENSE.
