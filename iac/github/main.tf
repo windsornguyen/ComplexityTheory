@@ -28,10 +28,13 @@ resource "github_repository" "this" {
 }
 
 resource "github_actions_repository_permissions" "this" {
-  repository           = github_repository.this.name
-  enabled              = true
-  allowed_actions      = "selected"
-  sha_pinning_required = true
+  repository      = github_repository.this.name
+  enabled         = true
+  allowed_actions = "selected"
+
+  # lean-action composes GitHub-owned cache actions by major tag. Hollywood
+  # still enforces immutable refs for every action declared in our workflows.
+  sha_pinning_required = false
 
   allowed_actions_config {
     github_owned_allowed = true
@@ -40,6 +43,8 @@ resource "github_actions_repository_permissions" "this" {
       "hashicorp/setup-terraform@*",
       "leanprover-community/docgen-action@*",
       "leanprover/lean-action@*",
+      "ruby/setup-ruby@*",
+      "xu-cheng/texlive-action@*",
     ]
     verified_allowed = false
   }
@@ -86,7 +91,7 @@ resource "github_repository_ruleset" "main" {
       dismiss_stale_reviews_on_push     = false
       require_code_owner_review         = false
       require_last_push_approval        = false
-      required_approving_review_count   = 1
+      required_approving_review_count   = 0
       required_review_thread_resolution = true
     }
 
