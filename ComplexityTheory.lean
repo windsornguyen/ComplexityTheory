@@ -8,6 +8,7 @@ import ComplexityTheory.Foundations.FormulaRestriction
 import ComplexityTheory.Foundations.FormulaPadding
 import ComplexityTheory.Foundations.DecisionProblem
 import ComplexityTheory.Computability.PolyTime
+import ComplexityTheory.Computability.ConditionalIdentity
 import ComplexityTheory.ComplexityClasses.P
 import ComplexityTheory.ComplexityClasses.Tautology
 import ComplexityTheory.ProofComplexity.ProofSystem
