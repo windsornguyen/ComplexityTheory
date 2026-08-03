@@ -17,6 +17,10 @@ exact single-step transition equations.
 Mathlib contributors, *Mathlib*, 2026, v4.32.1,
 `Mathlib.Computability.TuringMachine.Computable`, definition `Turing.initList`,
 supplies the canonical source-machine input configuration specialized below.
+The same version's `Mathlib.Computability.StateTransition`, structure
+`StateTransition.EvalsToInTime` and definition `EvalsToInTime.trans`, supplies
+the bounded-evaluation relation and composition operation used by the phase
+proof.
 -/
 
 namespace ComplexityTheory
@@ -160,6 +164,107 @@ def restoreConfiguration
   var := { initialState certificate.tm with bufferedInput }
   stk := wrapperStacks certificate.tm
     (Turing.initList certificate.tm restored).stk temporary backup
+
+/-- One nonempty reversing step moves the input head onto the temporary stack. -/
+theorem step_copyConfiguration_cons
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (head : certificate.tm.Γ certificate.tm.k₀)
+    (remaining temporary : List (certificate.tm.Γ certificate.tm.k₀))
+    (bufferedInput : Option (certificate.tm.Γ certificate.tm.k₀)) :
+    (machine certificate rejectionOutput).step
+        (copyConfiguration certificate rejectionOutput
+          (head :: remaining) temporary bufferedInput) =
+      some (copyConfiguration certificate rejectionOutput
+        remaining (head :: temporary) (some head)) := by
+  change Turing.TM2.step (program certificate rejectionOutput) _ = _
+  -- Frame lemmas keep the untouched source, temporary, and backup stacks abstract.
+  simp only [Turing.TM2.step, Turing.TM2.stepAux, program,
+    copyToTemporaryStatement, copyConfiguration]
+  simp only [wrapperStacks_source, initList_inputStack]
+  simp only [List.head?_cons, List.tail_cons]
+  simp
+  congr
+
+/-- An empty source input transfers control to the restoring phase. -/
+theorem step_copyConfiguration_nil
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (temporary : List (certificate.tm.Γ certificate.tm.k₀))
+    (bufferedInput : Option (certificate.tm.Γ certificate.tm.k₀)) :
+    (machine certificate rejectionOutput).step
+        (copyConfiguration certificate rejectionOutput [] temporary bufferedInput) =
+      some (restoreConfiguration certificate rejectionOutput [] temporary [] none) := by
+  change Turing.TM2.step (program certificate rejectionOutput) _ = _
+  simp only [Turing.TM2.step, Turing.TM2.stepAux, program,
+    copyToTemporaryStatement, copyConfiguration]
+  simp only [wrapperStacks_source, initList_inputStack]
+  simp only [List.head?, List.tail]
+  simp only [restoreConfiguration]
+  simp
+  congr
+
+/--
+One nonempty restoring step returns a symbol to the source input and writes its
+external Boolean value to the backup.
+-/
+theorem step_restoreConfiguration_cons
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (restored : List (certificate.tm.Γ certificate.tm.k₀))
+    (head : certificate.tm.Γ certificate.tm.k₀)
+    (temporary : List (certificate.tm.Γ certificate.tm.k₀)) (backup : BitString)
+    (bufferedInput : Option (certificate.tm.Γ certificate.tm.k₀)) :
+    (machine certificate rejectionOutput).step (restoreConfiguration certificate rejectionOutput
+        restored (head :: temporary) backup bufferedInput) =
+      some (restoreConfiguration certificate rejectionOutput (head :: restored) temporary
+        (certificate.inputAlphabet head :: backup) (some head)) := by
+  change Turing.TM2.step (program certificate rejectionOutput) _ = _
+  simp only [Turing.TM2.step, Turing.TM2.stepAux, program,
+    restoreInputStatement, restoreConfiguration]
+  simp only [wrapperStacks_temporary]
+  simp only [List.head?_cons, List.tail_cons]
+  simp
+  congr
+
+/-- Package one verified transition as an exact one-step evaluation bound. -/
+def oneStepEvaluation
+    {state : Type} {transition : state → Option state} {start finish : state}
+    (step_eq : transition start = some finish) :
+  StateTransition.EvalsToInTime transition start (some finish) 1 where
+  steps := 1
+  evals_in_steps := by
+    change transition start = some finish
+    exact step_eq
+  steps_le_m := le_rfl
+
+/--
+The copying phase consumes every source-input symbol and reverses it onto the
+temporary stack. It transfers control to restoration within
+`input.length + 1` steps; the certificate states an upper bound, not equality.
+-/
+def evaluatesCopyPhase
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (input temporary : List (certificate.tm.Γ certificate.tm.k₀))
+    (bufferedInput : Option (certificate.tm.Γ certificate.tm.k₀)) :
+    StateTransition.EvalsToInTime (machine certificate rejectionOutput).step
+      (copyConfiguration certificate rejectionOutput input temporary bufferedInput)
+      (some (restoreConfiguration certificate rejectionOutput []
+        (input.reverseAux temporary) [] none))
+      (input.length + 1) := by
+  induction input generalizing temporary bufferedInput with
+  | nil =>
+      simpa using oneStepEvaluation
+        (step_copyConfiguration_nil certificate rejectionOutput temporary bufferedInput)
+  | cons head remaining inductionHypothesis =>
+      have firstStep := oneStepEvaluation
+        (step_copyConfiguration_cons certificate rejectionOutput head remaining temporary
+          bufferedInput)
+      have remainingSteps := inductionHypothesis (head :: temporary) (some head)
+      simpa [List.reverseAux] using StateTransition.EvalsToInTime.trans
+        (machine certificate rejectionOutput).step 1 (remaining.length + 1)
+        (copyConfiguration certificate rejectionOutput (head :: remaining) temporary bufferedInput)
+        (copyConfiguration certificate rejectionOutput remaining (head :: temporary) (some head))
+        (some (restoreConfiguration certificate rejectionOutput []
+          (remaining.reverseAux (head :: temporary)) [] none))
+        firstStep remainingSteps
 
 end ConditionalIdentity
 
