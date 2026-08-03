@@ -20,7 +20,7 @@ namespace ComplexityTheory
 
 namespace BooleanFormula
 
-/-- The constant-true formula is a tautology and serves as a safe fallback output. -/
+/-- The constant-true formula is the canonical output for rejected proof strings. -/
 @[simp] theorem isTautology_tru : BooleanFormula.tru.IsTautology := by
   simp [IsTautology, Satisfies, eval]
 
