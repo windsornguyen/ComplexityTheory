@@ -19,6 +19,9 @@ Mathlib contributors, *Mathlib*, 2026, v4.32.1,
 `Mathlib.Computability.TuringMachine.StackTuringMachine`, definitions
 `Turing.TM2.step` and `Turing.TM2.stepAux`, supply the configurations and
 transition semantics specialized below.
+The same version's `Mathlib.Computability.StateTransition`, structure
+`StateTransition.EvalsToInTime` and definition `EvalsToInTime.trans`, supplies
+the bounded-evaluation relation and composition operation used here.
 -/
 
 namespace ComplexityTheory
@@ -186,6 +189,66 @@ theorem step_clearingConfiguration_nil
   simp [resetAndHalt, initialState, Turing.haltList]
   congr
   simpa [Turing.haltList] using wrapperStacks_haltList certificate rejectionOutput rejectionOutput
+
+/--
+Clearing an `n`-bit rejected input and writing its declared output takes at most
+`n + 1` steps.
+-/
+def evaluatesClearingPhase
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput backup : BitString) (flag : Bool) :
+    StateTransition.EvalsToInTime (machine certificate rejectionOutput).step
+      (clearingConfiguration certificate rejectionOutput backup flag)
+      (some (Turing.haltList (machine certificate rejectionOutput) rejectionOutput))
+      (backup.length + 1) := by
+  induction backup generalizing flag with
+  | nil =>
+      simpa using oneStepEvaluation
+        (step_clearingConfiguration_nil certificate rejectionOutput flag)
+  | cons head remaining inductionHypothesis =>
+      have firstStep := oneStepEvaluation
+        (step_clearingConfiguration_cons certificate rejectionOutput head remaining flag)
+      have remainingSteps := inductionHypothesis true
+      simpa using StateTransition.EvalsToInTime.trans
+        (machine certificate rejectionOutput).step 1 (remaining.length + 1)
+        (clearingConfiguration certificate rejectionOutput (head :: remaining) flag)
+        (clearingConfiguration certificate rejectionOutput remaining true)
+        (some (Turing.haltList (machine certificate rejectionOutput) rejectionOutput))
+        firstStep remainingSteps
+
+/--
+Output selection takes at most `n + 2` steps for an `n`-bit saved input. The
+accepting branch uses one step; the rejecting branch also clears the input.
+-/
+def evaluatesOutputPhase
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput backup : BitString) (decision : Bool) :
+    StateTransition.EvalsToInTime (machine certificate rejectionOutput).step
+      (embeddedConfiguration certificate rejectionOutput
+        (Turing.haltList certificate.tm [certificate.outputAlphabet.invFun decision]) backup)
+      (some (Turing.haltList (machine certificate rejectionOutput)
+        (if decision then backup else rejectionOutput)))
+      (backup.length + 2) := by
+  cases decision with
+  | false =>
+      have firstStep := oneStepEvaluation
+        (step_rejectingOutput certificate rejectionOutput backup)
+      have remainingSteps := evaluatesClearingPhase certificate rejectionOutput backup false
+      simpa using StateTransition.EvalsToInTime.trans
+        (machine certificate rejectionOutput).step 1 (backup.length + 1)
+        (embeddedConfiguration certificate rejectionOutput
+          (Turing.haltList certificate.tm [certificate.outputAlphabet.invFun false]) backup)
+        (clearingConfiguration certificate rejectionOutput backup false)
+        (some (Turing.haltList (machine certificate rejectionOutput) rejectionOutput))
+        firstStep remainingSteps
+  | true =>
+      have acceptingStep :=
+        oneStepEvaluation (step_acceptingOutput certificate rejectionOutput backup)
+      -- The common `n + 2` clock intentionally widens this one-step accepting path.
+      exact {
+        toEvalsTo := acceptingStep.toEvalsTo
+        steps_le_m := acceptingStep.steps_le_m.trans (by omega)
+      }
 
 end ConditionalIdentity
 
