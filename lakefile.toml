@@ -1,5 +1,5 @@
 name = "complexitytheory"
-version = "0.0.2"
+version = "0.0.3"
 description = "A formalization of computational complexity theory in Lean"
 keywords = ["complexity-theory", "formal-verification", "math"]
 homepage = "https://github.com/windsornguyen/ComplexityTheory"
