@@ -1,0 +1,138 @@
+/-
+Copyright (c) 2026 Windsor Nguyen and contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Windsor Nguyen
+-/
+
+import ComplexityTheory.Computability.ConditionalIdentity.Copy
+
+/-!
+# Source-machine simulation for conditional identity
+
+The conditional-identity wrapper executes each nonhalting source-machine step
+without changing its source stacks or state semantics. Source halting becomes
+the wrapper's decision-reading phase, which chooses either the saved input or
+the declared rejection output.
+
+Mathlib contributors, *Mathlib*, 2026, v4.32.1,
+`Mathlib.Computability.TuringMachine.StackTuringMachine`, definitions
+`Turing.TM2.stepAux` and `Turing.TM2.step`, and
+`Mathlib.Computability.TuringMachine.Computable`, definition
+`Turing.FinTM2.step`, supply the transition semantics simulated below.
+-/
+
+namespace ComplexityTheory
+
+namespace PolyTimeComputable
+
+namespace ConditionalIdentity
+
+variable {predicate : BitString → Bool}
+
+/-- Map a source label to its wrapper label, sending source halt to postprocessing. -/
+def embeddedLabel (source : Turing.FinTM2) : Option source.Λ → Option (Label source)
+  | some label => some (.source label)
+  | none => some .readDecision
+
+/--
+Embed a source configuration with empty temporary storage and an untouched
+Boolean backup. The source label, state, and stacks retain their meanings.
+-/
+def embeddedSourceConfiguration (source : Turing.FinTM2)
+    (sourceConfiguration : source.Cfg)
+    (backup : BitString) :
+    Turing.TM2.Cfg (Alphabet source) (Label source) (State source) where
+  l := embeddedLabel source sourceConfiguration.l
+  var := { initialState source with sourceState := sourceConfiguration.var }
+  stk := wrapperStacks source sourceConfiguration.stk [] backup
+
+/-- The source configuration embedded in this certificate's concrete wrapper. -/
+def embeddedConfiguration
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (sourceConfiguration : certificate.tm.Cfg)
+    (backup : BitString) : (machine certificate rejectionOutput).Cfg where
+  l := embeddedLabel certificate.tm sourceConfiguration.l
+  var := { initialState certificate.tm with sourceState := sourceConfiguration.var }
+  stk := wrapperStacks certificate.tm sourceConfiguration.stk [] backup
+
+/-- An empty temporary stack transfers restoration to the embedded source machine. -/
+theorem step_restoreConfiguration_nil
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (restored : List (certificate.tm.Γ certificate.tm.k₀))
+    (backup : BitString)
+    (bufferedInput : Option (certificate.tm.Γ certificate.tm.k₀)) :
+    (machine certificate rejectionOutput).step
+        (restoreConfiguration certificate rejectionOutput restored [] backup bufferedInput) =
+      some (embeddedConfiguration certificate rejectionOutput
+        (Turing.initList certificate.tm restored) backup) := by
+  change Turing.TM2.step (program certificate rejectionOutput) _ = _
+  simp only [Turing.TM2.step, Turing.TM2.stepAux, program,
+    restoreInputStatement, restoreConfiguration]
+  simp only [wrapperStacks_temporary, List.head?, List.tail]
+  simp [embeddedConfiguration, embeddedLabel, Turing.initList, initialState]
+  congr
+
+/--
+Embedding commutes with the execution of one source statement. In particular,
+a source `halt` becomes the wrapper's `readDecision` label.
+-/
+theorem stepAux_embedStatement (source : Turing.FinTM2)
+    (statement : Turing.TM2.Stmt source.Γ source.Λ source.σ)
+    (sourceState : source.σ) (sourceStacks : ∀ stack, List (source.Γ stack))
+    (backup : BitString) :
+    Turing.TM2.stepAux (embedStatement source statement)
+        { initialState source with sourceState := sourceState }
+        (wrapperStacks source sourceStacks [] backup) =
+      embeddedSourceConfiguration source
+        (Turing.TM2.stepAux statement sourceState sourceStacks) backup := by
+  induction statement generalizing sourceState sourceStacks with
+  | push stack value next inductionHypothesis =>
+      simp [embedStatement, Turing.TM2.stepAux, inductionHypothesis]
+  | peek stack update next inductionHypothesis =>
+      simp [embedStatement, Turing.TM2.stepAux, inductionHypothesis]
+  | pop stack update next inductionHypothesis =>
+      simp [embedStatement, Turing.TM2.stepAux, inductionHypothesis]
+  | load update next inductionHypothesis =>
+      simp [embedStatement, Turing.TM2.stepAux, inductionHypothesis]
+  | branch condition accept reject acceptHypothesis rejectHypothesis =>
+      cases hcondition : condition sourceState <;>
+        simp [embedStatement, Turing.TM2.stepAux, hcondition,
+          acceptHypothesis, rejectHypothesis]
+  | goto next =>
+      simp [embedStatement, Turing.TM2.stepAux, embeddedSourceConfiguration, embeddedLabel]
+  | halt =>
+      simp [embedStatement, Turing.TM2.stepAux, embeddedSourceConfiguration, embeddedLabel]
+
+/-- One nonhalting source-machine transition is one wrapper transition. -/
+theorem step_embeddedConfiguration
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (sourceConfiguration nextConfiguration : certificate.tm.Cfg)
+    (backup : BitString)
+    (step_eq : certificate.tm.step sourceConfiguration = some nextConfiguration) :
+    (machine certificate rejectionOutput).step
+        (embeddedConfiguration certificate rejectionOutput sourceConfiguration backup) =
+      some (embeddedConfiguration certificate rejectionOutput nextConfiguration backup) := by
+  cases sourceConfiguration with
+  | mk sourceLabel sourceState sourceStacks =>
+      cases sourceLabel with
+      | none =>
+          -- A halted source has no successor, contradicting the supplied nonhalting step.
+          simp [Turing.FinTM2.step, Turing.TM2.step] at step_eq
+      | some sourceLabel =>
+          -- Both machines now execute the same statement tree under the embedding.
+          change some (Turing.TM2.stepAux (certificate.tm.m sourceLabel)
+            sourceState sourceStacks) = some nextConfiguration at step_eq
+          injection step_eq with stepAux_eq
+          subst nextConfiguration
+          change some (Turing.TM2.stepAux
+            (embedStatement certificate.tm (certificate.tm.m sourceLabel))
+            { initialState certificate.tm with sourceState := sourceState }
+            (wrapperStacks certificate.tm sourceStacks [] backup)) = _
+          rw [stepAux_embedStatement]
+          rfl
+
+end ConditionalIdentity
+
+end PolyTimeComputable
+
+end ComplexityTheory
