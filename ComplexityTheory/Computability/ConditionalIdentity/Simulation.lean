@@ -19,6 +19,9 @@ Mathlib contributors, *Mathlib*, 2026, v4.32.1,
 `Turing.TM2.stepAux` and `Turing.TM2.step`, and
 `Mathlib.Computability.TuringMachine.Computable`, definition
 `Turing.FinTM2.step`, supply the transition semantics simulated below.
+The same version's `Mathlib.Computability.StateTransition`, structure
+`StateTransition.EvalsToInTime` and definition `EvalsToInTime.trans`, supplies
+the bounded-evaluation relation and composition operation used here.
 -/
 
 namespace ComplexityTheory
@@ -130,6 +133,105 @@ theorem step_embeddedConfiguration
             (wrapperStacks certificate.tm sourceStacks [] backup)) = _
           rw [stepAux_embedStatement]
           rfl
+
+@[simp]
+private theorem iterate_optionTransition_none {state : Type}
+    (transition : state → Option state) (steps : ℕ) :
+    (flip Option.bind transition)^[steps] none = none := by
+  induction steps with
+  | zero => rfl
+  | succ steps inductionHypothesis =>
+      rw [Function.iterate_succ_apply]
+      change (flip Option.bind transition)^[steps] none = none
+      exact inductionHypothesis
+
+/--
+An exact source evaluation lifts to an exact wrapper evaluation with the same
+number of steps while the saved Boolean input remains untouched.
+-/
+theorem iterate_embeddedConfiguration
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (backup : BitString) (steps : ℕ)
+    (start finish : certificate.tm.Cfg)
+    (sourceEvaluation :
+      (flip Option.bind certificate.tm.step)^[steps] (some start) = some finish) :
+    (flip Option.bind (machine certificate rejectionOutput).step)^[steps]
+        (some (embeddedConfiguration certificate rejectionOutput start backup)) =
+      some (embeddedConfiguration certificate rejectionOutput finish backup) := by
+  induction steps generalizing start finish with
+  | zero =>
+      simp only [Function.iterate_zero_apply] at sourceEvaluation ⊢
+      injection sourceEvaluation with configuration_eq
+      subst finish
+      rfl
+  | succ steps inductionHypothesis =>
+      rw [Function.iterate_succ_apply] at sourceEvaluation ⊢
+      change (flip Option.bind certificate.tm.step)^[steps]
+        (certificate.tm.step start) = some finish at sourceEvaluation
+      change (flip Option.bind (machine certificate rejectionOutput).step)^[steps]
+        ((machine certificate rejectionOutput).step
+          (embeddedConfiguration certificate rejectionOutput start backup)) = _
+      cases hstep : certificate.tm.step start with
+      | none =>
+          -- Exact evaluation to `finish` rules out an early source halt.
+          rw [hstep, iterate_optionTransition_none] at sourceEvaluation
+          contradiction
+      | some next =>
+          rw [hstep] at sourceEvaluation
+          rw [step_embeddedConfiguration certificate rejectionOutput start next backup hstep]
+          exact inductionHypothesis next finish sourceEvaluation
+
+/-- Lift a bounded source evaluation without increasing its stated upper bound. -/
+def embeddedEvaluation
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (backup : BitString) (bound : ℕ)
+    (start finish : certificate.tm.Cfg)
+    (sourceEvaluation : StateTransition.EvalsToInTime certificate.tm.step
+      start (some finish) bound) :
+    StateTransition.EvalsToInTime (machine certificate rejectionOutput).step
+      (embeddedConfiguration certificate rejectionOutput start backup)
+      (some (embeddedConfiguration certificate rejectionOutput finish backup)) bound where
+  steps := sourceEvaluation.steps
+  evals_in_steps := iterate_embeddedConfiguration certificate rejectionOutput backup
+    sourceEvaluation.steps start finish sourceEvaluation.evals_in_steps
+  steps_le_m := sourceEvaluation.steps_le_m
+
+/--
+The restoration phase returns every temporary symbol to the source input and
+builds its external Boolean backup. The final extra step enters source code.
+-/
+def evaluatesRestorePhase
+    (certificate : PolyTimeComputable id Computability.encodeBool predicate)
+    (rejectionOutput : BitString) (restored temporary : List (certificate.tm.Γ certificate.tm.k₀))
+    (backup : BitString)
+    (bufferedInput : Option (certificate.tm.Γ certificate.tm.k₀)) :
+    StateTransition.EvalsToInTime (machine certificate rejectionOutput).step
+      (restoreConfiguration certificate rejectionOutput restored temporary backup bufferedInput)
+      (some (embeddedConfiguration certificate rejectionOutput
+        (Turing.initList certificate.tm (temporary.reverseAux restored))
+        ((temporary.map certificate.inputAlphabet).reverseAux backup)))
+      (temporary.length + 1) := by
+  induction temporary generalizing restored backup bufferedInput with
+  | nil =>
+      simpa using oneStepEvaluation
+        (step_restoreConfiguration_nil certificate rejectionOutput restored backup bufferedInput)
+  | cons head temporary inductionHypothesis =>
+      have firstStep := oneStepEvaluation
+        (step_restoreConfiguration_cons certificate rejectionOutput restored head temporary backup
+          bufferedInput)
+      have remainingSteps := inductionHypothesis (head :: restored)
+        (certificate.inputAlphabet head :: backup) (some head)
+      simpa [List.reverseAux] using StateTransition.EvalsToInTime.trans
+        (machine certificate rejectionOutput).step 1 (temporary.length + 1)
+        (restoreConfiguration certificate rejectionOutput restored (head :: temporary) backup
+          bufferedInput)
+        (restoreConfiguration certificate rejectionOutput (head :: restored) temporary
+          (certificate.inputAlphabet head :: backup) (some head))
+        (some (embeddedConfiguration certificate rejectionOutput
+          (Turing.initList certificate.tm (temporary.reverseAux (head :: restored)))
+          ((temporary.map certificate.inputAlphabet).reverseAux
+            (certificate.inputAlphabet head :: backup))))
+        firstStep remainingSteps
 
 end ConditionalIdentity
 
