@@ -15,6 +15,7 @@ import ComplexityTheory.Computability.ConditionalIdentity.Output
 import ComplexityTheory.Computability.TwoStackMachine
 import ComplexityTheory.Computability.TwoStackMachine.InstructionEncoding
 import ComplexityTheory.Computability.TwoStackMachine.InstructionEncoding.Canonical
+import ComplexityTheory.Computability.TwoStackMachine.ProgramEncoding
 import ComplexityTheory.ComplexityClasses.P
 import ComplexityTheory.ComplexityClasses.Tautology
 import ComplexityTheory.ProofComplexity.ProofSystem
