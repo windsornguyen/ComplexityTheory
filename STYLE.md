@@ -50,13 +50,30 @@ provenance readable as the library grows.
 
 ## Lean Source
 
-- Follow current Mathlib naming, formatting, and simplifier conventions.
+- Follow current Mathlib formatting and simplifier conventions.
 - Use `[simp]` only for canonical reductions with a clear normal form.
 - Prefer proofs whose intermediate names expose the argument over compressed
   tactic scripts. Proof brevity is useful only while the proof remains clear.
 - Keep modules focused and add every public module to `ComplexityTheory.lean`.
 - Keep files below 500 lines and pull requests below 200 changed lines when
   practical. Use stacked pull requests for dependent layers.
+
+### Naming
+
+Follow Mathlib contributors, *Mathlib naming conventions*, Lean 4,
+[“File names” and “General conventions: Capitalization”](https://leanprover-community.github.io/contribute/naming.html)
+(accessed August 3, 2026):
+
+- Terms of propositions, including proofs and theorem names, use `snake_case`.
+- Propositions, types, sorts, inductive types, structures, and classes use
+  `UpperCamelCase`.
+- Functions use the capitalization of their return values.
+- All other terms of types use `lowerCamelCase`.
+- Inside a `snake_case` name, reference a `UpperCamelCase` declaration as
+  `lowerCamelCase`.
+- Capitalize acronyms as a group according to the surrounding identifier.
+- Apply these rules equally to structure fields and inductive constructors.
+- Name `.lean` files with `UpperCamelCase`. Discuss any exception first.
 
 Mathlib's header linter requires the copyright and license lines in this exact
 form; list the actual file authors on the final line:
