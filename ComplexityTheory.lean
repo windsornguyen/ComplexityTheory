@@ -26,6 +26,7 @@ import ComplexityTheory.ProofComplexity.Diagonal
 import ComplexityTheory.ProofComplexity.ClockedDiagonal
 import ComplexityTheory.ProofComplexity.TwoStackInterpreter
 import ComplexityTheory.ProofComplexity.TwoStackChargedInterpreter
+import ComplexityTheory.ProofComplexity.TwoStackChargedSimulation
 import ComplexityTheory.ProofComplexity.CookReckhow
 import ComplexityTheory.ProofComplexity.Jump
 import ComplexityTheory.ProofComplexity.DeciderSystem
