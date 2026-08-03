@@ -172,6 +172,21 @@ def decode? (bits : BitString) : Option Program :=
   unfold decode?
   rw [show encode program = encode program ++ [] by simp, decodePrefix?_encode_append]
 
+/-- Exact decoding accepts only the canonical code of the returned program. -/
+theorem eq_encode_of_decode?_eq_some {bits : BitString} {program : Program}
+    (hdecode : decode? bits = some program) : bits = encode program := by
+  unfold decode? at hdecode
+  cases hprefix : decodePrefix? bits with
+  | none => simp [hprefix] at hdecode
+  | some result =>
+      rcases result with ⟨decoded, suffix⟩
+      cases suffix with
+      | nil =>
+          simp only [hprefix, Option.some.injEq] at hdecode
+          subst decoded
+          simpa using eq_encode_append_of_decodePrefix?_eq_some hprefix
+      | cons bit suffix => simp [hprefix] at hdecode
+
 /-- Exact decoding rejects a canonical program followed by any additional bit. -/
 theorem decode?_encode_append_eq_none (program : Program)
     {suffix : BitString} (hsuffix : suffix ≠ []) :
