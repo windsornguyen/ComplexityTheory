@@ -12,6 +12,7 @@ import ComplexityTheory.Computability.ConditionalIdentity
 import ComplexityTheory.Computability.ConditionalIdentity.Copy
 import ComplexityTheory.Computability.ConditionalIdentity.Simulation
 import ComplexityTheory.Computability.ConditionalIdentity.Output
+import ComplexityTheory.Computability.ConditionalIdentity.Correctness
 import ComplexityTheory.ComplexityClasses.P
 import ComplexityTheory.ComplexityClasses.Tautology
 import ComplexityTheory.ProofComplexity.ProofSystem
