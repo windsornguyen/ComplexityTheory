@@ -13,7 +13,8 @@ import ComplexityTheory.ProofComplexity.Jump
 A correct tautology decider turns each encoded tautology into its own proof and
 maps every other string to `true`. This is the structural part of the theorem
 that a polynomial-time TAUT decider yields a linearly bounded p-optimal proof
-system. No runtime claim is made in this module.
+system. This module certifies translations into that system as polynomial-time;
+it does not yet certify the induced system's proof map as polynomial-time.
 -/
 
 namespace ComplexityTheory
@@ -72,6 +73,20 @@ def translationFrom (decider : TautologyDecider) (source : TautologyProofSystem)
   preserves proof := by
     let tautology : Tautology := ⟨source.produce proof, source.sound proof⟩
     exact decider.output_encode tautology
+
+/--
+The canonical translation from a Cook-Reckhow system is polynomial-time. Its
+output bits are exactly the source proof map's encoded formula output, so the
+source machine and polynomial clock serve as the translation certificate
+without executing an additional encoder.
+-/
+def polyTimeTranslationFrom (decider : TautologyDecider)
+    (source : CookReckhowSystem) :
+    PolyTimeProofTranslation source.toTautologyProofSystem decider.proofSystem where
+  toProofTranslation := decider.translationFrom source.toTautologyProofSystem
+  computesInPolyTime :=
+    PolyTimeComputable.transport source.computesInPolyTime id
+      (fun _ => rfl) (fun _ => rfl)
 
 /-- The decider-induced system admits a translation from every semantic proof system. -/
 theorem hasTranslationFrom (decider : TautologyDecider)

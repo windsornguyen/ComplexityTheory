@@ -32,6 +32,19 @@ def toTautologyDecider (decider : PolyTimeDecider tautologyLanguage) :
     rw [decider.correct]
     exact encode_mem_tautologyLanguage formula
 
+/--
+The binary-language machine also computes the projected formula decision under
+the canonical formula encoding. No machine composition occurs: the transported
+certificate receives exactly the same input bits and emits the same Boolean
+encoding as the source certificate.
+-/
+def toTautologyDeciderComputesInPolyTime
+    (decider : PolyTimeDecider tautologyLanguage) :
+    PolyTimeComputable BooleanFormulaCode.encode Computability.encodeBool
+      decider.toTautologyDecider.decide :=
+  PolyTimeComputable.transport decider.computesInPolyTime
+    BooleanFormulaCode.encode (fun _ => rfl) (fun _ => rfl)
+
 /-- The projected formula decision is the source decider applied to the canonical code. -/
 @[simp] theorem toTautologyDecider_decide
     (decider : PolyTimeDecider tautologyLanguage) (formula : BooleanFormula) :
