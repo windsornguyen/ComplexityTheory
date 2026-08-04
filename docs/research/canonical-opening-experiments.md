@@ -221,6 +221,10 @@ parent tensor.
 
 ## Why the positive primitive does not scale
 
+The generic theorem `messageCardinality_ge_injectiveCanonicalFamily` makes the
+remaining burden explicit: exhibit a large injectively indexed family of
+canonical words and prove that the proposed decoder covers it.
+
 An affine equation on `n + 1` binary coordinates leaves `n` free coordinates.
 Lean proves that a deterministic no-response decoder representing every
 solution needs at least `2^n` messages. When the messages are `r`-bit strings,
