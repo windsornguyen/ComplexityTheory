@@ -129,7 +129,7 @@ construction must use a proximity interaction that produces a different
 compressed child, or make dense checksum rows locally accessible by some
 additional algebraic mechanism.
 
-## First finite synthesis result
+## Radius-one classification
 
 We exhaustively enumerated binary linear checksum matrices for three-bit words
 at decoding radius one. Lean verified:
@@ -154,9 +154,88 @@ every one-row matrix has two distinct equal-checksum words within radius one of
 a common center. The latter theorem is a complete finite cheating certificate,
 not merely a failed search result.
 
+The later symbolic proof explains the search result. Hamming's binary
+condition uses nonzero, pairwise-distinct check columns (1950, Section 3,
+pp. 150-154). Lean proves the finite-field projective generalization:
+radius-one unique decoding holds exactly when every checksum column is nonzero
+and no two columns are proportional. It also proves the Hamming inequality
+
+```text
+1 + input columns * (field order - 1)
+  <= field order ^ checksum rows.
+```
+
+For a binary checksum this becomes `n <= 2^r - 1`. The finite count remains a
+useful exhaustive regression test.
+
+## The first four-axis candidate exposed response splicing
+
+The first `2 x 2 x 2 x 2` experiment allowed one global word for the checksum
+audit and separate answers for coordinate openings. Its checksum was genuinely
+radius-one unique-decoding, so checksum quality was not the defect.
+
+For the all-zero canonical tensor and false claimed total one, the prover uses
+
+```text
+global response   = (1, 1, 1, 0)
+local responses   = (0, 0, 0, 0).
+```
+
+The global word lies in the checksum kernel and has odd total, while every
+local response is canonical. Lean verifies this explicit strategy and also
+exhaustively finds a cheating strategy. The generic theorem
+`safeForEveryChallenge_iff` identifies the pattern: independently safe global
+and local responses splice whenever the commitment does not bind them to one
+candidate.
+
+This negative result covers only the separated-response grammar. It is not a
+barrier against commitments or proximity protocols.
+
+## Three bits bind the finite affine fold exactly
+
+The corrected protocol sends no response after the challenge. For any nonzero
+binary linear functional `ell` on four block values, Lean constructs a
+three-bit checksum with a kernel vector `kappa` satisfying
+
+```text
+Hamming weight kappa >= 3
+dot ell kappa = 1.
+```
+
+The syndrome and public claimed bit are four independent equations, so they
+decode one global block word. A true parent uses the checksum of its canonical
+word. For a false parent, every syndrome decodes a different word, and some
+coordinate challenge emits a false child.
+
+The library now retains three distinct receipts:
+
+- executable finite search finds no cheating strategy for any four-coordinate
+  claim;
+- `FourCoordinateAffineBinding.exactStep` proves exactness symbolically; and
+- `FourAxisAffine.exactStep` instantiates the result for an explicit
+  `2 x 2 x 2 x 2` tensor and emits a two-axis tensor claim.
+
+The last theorem is semantic. It does not prove that compiled Lean code copies
+four field elements into the child or avoids retaining a closure over the
+parent tensor.
+
+## Why the positive primitive does not scale
+
+An affine equation on `n + 1` binary coordinates leaves `n` free coordinates.
+Lean proves that a deterministic no-response decoder representing every
+solution needs at least `2^n` messages. When the messages are `r`-bit strings,
+it derives `n <= r`.
+
+Thus the three-bit four-coordinate binder is cardinality-optimal but cannot
+compress an arbitrary exponentially larger block vector to square-log size.
+The lower bound assumes every affine solution must be representable; it does
+not cover structured canonical tensors or additional interaction.
+
 ## Next falsifiable step
 
-The next candidate must combine this checksum binding with an executable
-localization rule that exposes a row defect in the far case. It succeeds only
-if the emitted child is smaller than the parent without sending all slice
-values. Otherwise the product barrier applies unchanged.
+The finite correctness interface is no longer missing. The remaining candidate
+must beat the `n - 1` message barrier by exploiting structure in canonical
+tensors or by using a charged far-case proximity interaction. It must also
+connect the semantic two-axis child to an executable representation and full
+resource profile. Otherwise the affine cardinality or local-slice product
+barrier applies unchanged.

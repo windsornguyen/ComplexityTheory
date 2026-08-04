@@ -125,6 +125,20 @@ Hamming radius `d` of one center have different checksums. Lean proves:
 These are binding statements. They neither show that a candidate is near the
 canonical word nor locate an error in a far candidate.
 
+Hamming (1950, Section 3, pp. 150-154) gives the binary nonzero,
+pairwise-distinct-column condition. At radius one over a finite field, Lean
+proves its projective generalization:
+
+```text
+unique decoding
+  iff
+all columns are nonzero and no two are proportional.
+```
+
+Lean proves the exact cardinal inequality `1 + n*(q - 1) <= q^r`; the binary
+specialization is `n <= 2^r - 1`. These finite-field bounds do not supply a
+proximity test or a local implementation of a dense checksum row.
+
 If a checksum alone exactly decodes every coordinate of every word, Lean proves
 that the checksum is injective. Hence a shorter binary checksum cannot exactly
 decode every longer binary word without additional information or interaction.
@@ -153,11 +167,87 @@ For three-bit binary words at radius one, exhaustive evaluation proves that:
 - exactly six two-row matrices succeed; and
 - every one-row matrix has a checked collision witness.
 
-This is a complete finite certificate for that parameter choice. It is not the
-general Hamming-code classification and carries no asymptotic lower bound.
+This is a complete finite certificate for that parameter choice. The later
+projective classification explains the six survivors symbolically. The count
+remains a regression test rather than an independent asymptotic result.
+
+## Near-far composition
+
+`NearFarFold` separates a unique-decoding checksum, a canonical object, a local
+validity predicate, and an explicit proximity opening step. Lean proves that an
+invalid canonical object is far from every valid object in its checksum fiber
+and that an exact proximity step can be reinterpreted as an exact parent step.
+
+The interface does not construct the proximity step. In particular, it does
+not justify replacing a prover-selected checksum with the canonical checksum,
+or permit an uncharged oracle for deciding proximity.
+
+## Unbatched tensor accounting
+
+`unbatchedTensorOpening_not_clockClosing` proves that the sufficient inequality
+`Lambda^t < t` is impossible when `2 <= Lambda`. The companion winner-cost
+theorem states the corresponding natural-number mass bound.
+
+These results apply only to the audited unbatched tensor protocol composed with
+the current multiplicative-round compiler certificate. They are not lower
+bounds against arbitrary winner algorithms or tensor protocols.
+
+## Finite strategy checking and response splicing
+
+`hasCheatingOneStepStrategy` exhaustively decides whether a finite false parent
+has one proof safe under every challenge. The checker proves the Boolean result
+equivalent to the named existential proposition; candidate modules retain an
+explicit witness in addition to the search result.
+
+`SeparatedResponseStrategy.safeForEveryChallenge_iff` exposes the exact
+splicing seam: if the global response and each local response are independently
+safe under one commitment, they combine into a strategy safe for every
+challenge.
+
+`FourAxisSplicing` instantiates this grammar with a valid radius-one checksum.
+For the zero `2 x 2 x 2 x 2` tensor and false top value one, the global branch
+uses the odd checksum-kernel word `(1, 1, 1, 0)` while every local branch uses
+the canonical zero word. Lean checks both the explicit strategy and the
+exhaustive search result. This refutes only protocols that fail to bind the
+global and local responses to one candidate.
+
+## Exact four-axis affine fold
+
+`FourCoordinateAffineBinding` gives a positive no-response baseline. For every
+nonzero linear functional on four binary coordinates, it constructs a
+three-bit radius-one checksum whose kernel vector has weight at least three and
+affine value one. The public claimed bit plus the syndrome uniquely decodes one
+four-coordinate word.
+
+Lean proves the decoder equations, radius-one checksum property, exhaustive
+absence of a cheating finite strategy, and an `ExactOpeningStep` theorem. The
+tensor instantiation `FourAxisAffine.exactStep` groups a
+`2 x 2 x 2 x 2` tensor into four inner-slice contractions; one public
+coordinate challenge emits a two-axis child. There is no prover response after
+the challenge.
+
+This is semantic four-to-two shrinkage. The `Open2` type has two indices, but no
+current theorem connects its Lean representation to an implementation that
+copies exactly four field elements or avoids retaining a closure over the
+parent tensor.
+
+## Affine-binding cardinality barrier
+
+`messageCardinality_ge_twoPow_freeCoordinates` assumes a deterministic decoder
+represents every solution of one binary affine equation on `n + 1`
+coordinates. Lean proves that its message space has at least `2^n` elements.
+For an `r`-bit message, `binaryMessageLength_ge_freeCoordinates` gives
+`n <= r`.
+
+The coverage assumption is essential. This theorem does not cover a structured
+subset of canonical words, a probabilistic or interactive binder, or a
+protocol whose later messages contribute binding information.
 
 ## Open boundary
 
-The missing primitive must combine near-case checksum binding with a charged
-far-case proximity argument that either rejects or emits a genuinely smaller
-false child. No current theorem supplies that primitive.
+The exact four-to-two affine fold is an optimal finite correctness baseline,
+but its direct `n`-coordinate generalization transmits at least `n - 1` bits.
+The remaining asymptotic primitive must therefore exploit structure in the
+canonical tensors or combine a shorter checksum with a charged proximity
+interaction. No current theorem supplies square-log compression, an
+operational resource realization, or evidence for `P != NP`.
