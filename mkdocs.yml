@@ -21,6 +21,7 @@ plugins:
           - index.md
           - research/arzr-oracle-audit.md
           - research/canonical-opening-experiments.md
+          - research/canonical-opening-theorem-index.md
 
 markdown_extensions:
   - pymdownx.highlight
@@ -33,6 +34,7 @@ nav:
   - Research:
       - ARZR oracle audit: research/arzr-oracle-audit.md
       - Canonical opening experiments: research/canonical-opening-experiments.md
+      - Canonical opening theorem index: research/canonical-opening-theorem-index.md
 
 validation:
   omitted_files: warn
