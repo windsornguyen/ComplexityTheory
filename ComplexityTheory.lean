@@ -21,6 +21,17 @@ import ComplexityTheory.ProofComplexity.Simulation
 import ComplexityTheory.ProofComplexity.CookReckhow
 import ComplexityTheory.ProofComplexity.Jump
 import ComplexityTheory.ProofComplexity.DeciderSystem
+import ComplexityTheory.ProofComplexity.CanonicalOpening
+import ComplexityTheory.ProofComplexity.CanonicalOpening.Adaptive
+import ComplexityTheory.ProofComplexity.CanonicalOpening.TwoQuery
+import ComplexityTheory.ProofComplexity.CanonicalOpening.Step
+import ComplexityTheory.ProofComplexity.CanonicalOpening.LinearContraction
+import ComplexityTheory.ProofComplexity.CanonicalOpening.Checksum
+import ComplexityTheory.ProofComplexity.CanonicalOpening.Checksum.Finite
+import ComplexityTheory.ProofComplexity.CanonicalOpening.Resources
+import ComplexityTheory.ProofComplexity.CanonicalOpening.AdaptiveResources
+import ComplexityTheory.ProofComplexity.CanonicalOpening.LocalSliceBarrier
+import ComplexityTheory.ProofComplexity.CanonicalOpening.Checksum.LocalityBarrier
 
 /-!
 # ComplexityTheory
