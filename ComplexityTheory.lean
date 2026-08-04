@@ -34,6 +34,7 @@ import ComplexityTheory.ProofComplexity.CanonicalOpening.Checksum.Finite
 import ComplexityTheory.ProofComplexity.CanonicalOpening.Resources
 import ComplexityTheory.ProofComplexity.CanonicalOpening.AdaptiveResources
 import ComplexityTheory.ProofComplexity.CanonicalOpening.LocalSliceBarrier
+import ComplexityTheory.ProofComplexity.CanonicalOpening.TensorAccounting
 import ComplexityTheory.ProofComplexity.CanonicalOpening.Checksum.LocalityBarrier
 
 /-!
