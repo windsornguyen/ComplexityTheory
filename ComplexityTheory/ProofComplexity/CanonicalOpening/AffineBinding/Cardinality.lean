@@ -20,9 +20,38 @@ supplies additional binding information.
 
 namespace ComplexityTheory
 namespace CanonicalOpening
-namespace AffineBinding
 
 open scoped BigOperators
+
+/--
+Any deterministic decoder covering an injectively indexed family of canonical
+words needs at least one distinct message per family member.
+
+Informally, two different family members cannot share a message: decoding that
+message would make their canonical words equal. Applying this theorem to a
+research-specific family requires separate proofs that its canonical words are
+distinct and that the decoder represents every member.
+-/
+theorem messageCardinality_ge_injectiveCanonicalFamily
+    {Family Message Word : Type} [Fintype Family] [Fintype Message]
+    (canonicalWord : Family → Word)
+    (hCanonicalWordInjective : Function.Injective canonicalWord)
+    (decode : Message → Word)
+    (hCovers : ∀ family, ∃ message, decode message = canonicalWord family) :
+    Fintype.card Family ≤ Fintype.card Message := by
+  classical
+  let encode : Family → Message := fun family => Classical.choose (hCovers family)
+  have hEncode : ∀ family, decode (encode family) = canonicalWord family := fun family =>
+    Classical.choose_spec (hCovers family)
+  apply Fintype.card_le_of_injective encode
+  intro first second hEqual
+  apply hCanonicalWordInjective
+  calc
+    canonicalWord first = decode (encode first) := (hEncode first).symm
+    _ = decode (encode second) := congrArg decode hEqual
+    _ = canonicalWord second := hEncode second
+
+namespace AffineBinding
 
 /--
 Complete `n` free coordinates to one solution of a binary affine equation by
@@ -56,21 +85,9 @@ theorem messageCardinality_ge_twoPow_freeCoordinates
     (hCovers : ∀ free, ∃ message,
       decode message = completeWord pivot coefficient affineValue free) :
     2 ^ n ≤ Fintype.card Message := by
-  classical
-  let encode : (Fin n → BinaryField) → Message := fun free =>
-    Classical.choose (hCovers free)
-  have hEncode : ∀ free,
-      decode (encode free) = completeWord pivot coefficient affineValue free := fun free =>
-    Classical.choose_spec (hCovers free)
-  have hInjective : Function.Injective encode := by
-    intro first second hEqual
-    apply completeWord_injective pivot coefficient affineValue
-    calc
-      completeWord pivot coefficient affineValue first = decode (encode first) :=
-        (hEncode first).symm
-      _ = decode (encode second) := congrArg decode hEqual
-      _ = completeWord pivot coefficient affineValue second := hEncode second
-  have hCard := Fintype.card_le_of_injective encode hInjective
+  have hCard := messageCardinality_ge_injectiveCanonicalFamily
+    (completeWord pivot coefficient affineValue)
+    (completeWord_injective pivot coefficient affineValue) decode hCovers
   simpa using hCard
 
 /--

@@ -233,6 +233,11 @@ parent tensor.
 
 ## Affine-binding cardinality barrier
 
+`messageCardinality_ge_injectiveCanonicalFamily` isolates the underlying
+pigeonhole argument: any decoder covering an injectively indexed canonical
+family needs at least one message per family member. Applying it to a proposed
+structured family still requires explicit proofs of injectivity and coverage.
+
 `messageCardinality_ge_twoPow_freeCoordinates` assumes a deterministic decoder
 represents every solution of one binary affine equation on `n + 1`
 coordinates. Lean proves that its message space has at least `2^n` elements.
