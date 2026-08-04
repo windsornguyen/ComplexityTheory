@@ -27,6 +27,7 @@ import ComplexityTheory.ProofComplexity.CanonicalOpening.TwoQuery
 import ComplexityTheory.ProofComplexity.CanonicalOpening.Step
 import ComplexityTheory.ProofComplexity.CanonicalOpening.LinearContraction
 import ComplexityTheory.ProofComplexity.CanonicalOpening.Checksum
+import ComplexityTheory.ProofComplexity.CanonicalOpening.Checksum.RadiusOne
 import ComplexityTheory.ProofComplexity.CanonicalOpening.Checksum.Finite
 import ComplexityTheory.ProofComplexity.CanonicalOpening.Resources
 import ComplexityTheory.ProofComplexity.CanonicalOpening.AdaptiveResources
