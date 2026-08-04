@@ -28,6 +28,7 @@ import ComplexityTheory.ProofComplexity.CanonicalOpening.Step
 import ComplexityTheory.ProofComplexity.CanonicalOpening.FiniteStrategy
 import ComplexityTheory.ProofComplexity.CanonicalOpening.AffineBinding
 import ComplexityTheory.ProofComplexity.CanonicalOpening.AffineBinding.Exact
+import ComplexityTheory.ProofComplexity.CanonicalOpening.FourAxisAffine
 import ComplexityTheory.ProofComplexity.CanonicalOpening.FourAxisSplicing
 import ComplexityTheory.ProofComplexity.CanonicalOpening.LinearContraction
 import ComplexityTheory.ProofComplexity.CanonicalOpening.NearFar
