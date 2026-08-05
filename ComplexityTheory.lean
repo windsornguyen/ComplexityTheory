@@ -22,6 +22,7 @@ import ComplexityTheory.Computability.ConditionalIdentity.Simulation
 import ComplexityTheory.Computability.ConditionalIdentity.Output
 import ComplexityTheory.ComplexityClasses.P
 import ComplexityTheory.ComplexityClasses.NP
+import ComplexityTheory.ComplexityClasses.NP.FromP
 import ComplexityTheory.ComplexityClasses.Tautology
 import ComplexityTheory.ProofComplexity.ProofSystem
 import ComplexityTheory.ProofComplexity.Verifier
