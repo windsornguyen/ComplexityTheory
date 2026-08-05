@@ -12,6 +12,7 @@ import ComplexityTheory.Computability.PolynomialClock
 import ComplexityTheory.Computability.PairFirstComposition
 import ComplexityTheory.Computability.PairFirstComposition.Stacks
 import ComplexityTheory.Computability.PairFirstComposition.Transitions
+import ComplexityTheory.Computability.PairFirstComposition.Simulation
 import ComplexityTheory.Computability.ConditionalIdentity
 import ComplexityTheory.Computability.ConditionalIdentity.Copy
 import ComplexityTheory.Computability.ConditionalIdentity.Simulation
