@@ -10,6 +10,7 @@ import ComplexityTheory.Foundations.DecisionProblem
 import ComplexityTheory.Computability.PolyTime
 import ComplexityTheory.Computability.PolynomialClock
 import ComplexityTheory.Computability.PairFirstComposition
+import ComplexityTheory.Computability.PairFirstComposition.Stacks
 import ComplexityTheory.Computability.ConditionalIdentity
 import ComplexityTheory.Computability.ConditionalIdentity.Copy
 import ComplexityTheory.Computability.ConditionalIdentity.Simulation
