@@ -14,6 +14,8 @@ import ComplexityTheory.Computability.PairFirstComposition.Stacks
 import ComplexityTheory.Computability.PairFirstComposition.Transitions
 import ComplexityTheory.Computability.PairFirstComposition.Simulation
 import ComplexityTheory.Computability.PairFirstComposition.ParseFirst
+import ComplexityTheory.Computability.PairFirstComposition.Parsing
+import ComplexityTheory.Computability.PairFirstComposition.Clock
 import ComplexityTheory.Computability.ConditionalIdentity
 import ComplexityTheory.Computability.ConditionalIdentity.Copy
 import ComplexityTheory.Computability.ConditionalIdentity.Simulation
